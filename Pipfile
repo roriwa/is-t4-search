@@ -4,9 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-chromadb = "*"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
+chromadb = "*"
+pymongo = {extras = ["srv"], version = "*"}
 loggext = "*"
 config-library = {extras = ["yaml"], version = "*"}
 

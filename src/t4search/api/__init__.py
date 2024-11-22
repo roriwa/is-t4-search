@@ -3,14 +3,19 @@ r"""
 
 """
 import fastapi
+from pydantic import BaseModel
 
 
 api = fastapi.FastAPI(title="T4Search API")
 
 
-@api.get("/")
-def index():
-    return {'message': "Hello World!"}
+class IndexModel(BaseModel):
+    message: str
+
+
+@api.get("/", response_model=IndexModel)
+def index() -> IndexModel:
+    return IndexModel(message="Hello World!")
 
 
 def __main__(**kwargs):

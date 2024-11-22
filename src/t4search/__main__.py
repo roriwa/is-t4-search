@@ -23,11 +23,14 @@ sync_parser = subparsers.add_parser(name="sync", formatter_class=ap.ArgumentDefa
 
 
 def main(argv: t.List[str] = None) -> int:
+    from .logging import configure as configure_logging
+
     arguments = vars(parser.parse_args(argv))
     __main__ = arguments.pop('__main__')
     config_file = os.getenv("CONFIG_FILE")
     if config_file:
         configlib.config.update(configlib.load(config_file))
+    configure_logging()
     submodule = importlib.import_module(f".{__main__}", package=__package__)
     submodule.__main__(**arguments)
     return 0

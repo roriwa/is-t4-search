@@ -8,7 +8,7 @@ cron
 tail -f /var/log/cron.log &
 
 # Start Chroma
-chroma run --path "$DATA_DIR" --host "0.0.0.0" --port "$CHROMA_PORT" --log-path "/var/log/chroma.log" &
+chroma run --path "$DATA_DIR/chroma" --host "0.0.0.0" --port "$CHROMA_PORT" --log-path "/var/log/chroma.log" &
 CHROMA_PID=$!
 
 # Start API

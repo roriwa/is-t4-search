@@ -4,7 +4,7 @@ r"""
 """
 import typing as t
 import fastapi
-from ..core import create_chroma_client
+from ..core import create_chroma_client, DateRange
 from .models import *
 
 
@@ -19,6 +19,7 @@ def query(
         dates: t.List[str] = fastapi.Query(default_factory=list),
         parties: t.List[str] = fastapi.Query(default_factory=list),
 ) -> t.List[QueryResponseModel]:
+    dates: t.List[DateRange] = list(map(DateRange.from_string, dates))
     return []
 
 

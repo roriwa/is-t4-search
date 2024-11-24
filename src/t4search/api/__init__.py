@@ -2,20 +2,24 @@
 r"""
 
 """
+import typing as t
 import fastapi
-from pydantic import BaseModel
+from ..core import create_chroma_client
+from .models import *
 
 
 api = fastapi.FastAPI(title="T4Search API")
+chroma_client = create_chroma_client()
 
 
-class IndexModel(BaseModel):
-    message: str
-
-
-@api.get("/", response_model=IndexModel)
-def index() -> IndexModel:
-    return IndexModel(message="Hello World!")
+@api.get("/api/query", response_model=t.List[QueryResponseModel])
+def query(
+        topics: t.List[str] = fastapi.Query(min_length=1),
+        persons: t.List[str] =  fastapi.Query(default_factory=list),
+        dates: t.List[str] = fastapi.Query(default_factory=list),
+        parties: t.List[str] = fastapi.Query(default_factory=list),
+) -> t.List[QueryResponseModel]:
+    return []
 
 
 def __main__(**kwargs):

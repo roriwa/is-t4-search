@@ -1,3 +1,9 @@
 api:
   host: 0.0.0.0
   port: 80
+chroma:
+  host: 0.0.0.0
+  port: 9010
+logging:
+  format: @SHORT
+  level: INFO

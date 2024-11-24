@@ -32,6 +32,9 @@ don't forget to create the `config.yaml`
 api:
   host: "0.0.0.0"
   port: 8000
+chroma:
+  host: "0.0.0.0"
+  port: 9010
 logging:
   level: DEBUG | INFO | WARNING | ERROR | CRITICAL
   format: @SHORT | @LONG | "CUSTOM"

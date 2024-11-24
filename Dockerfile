@@ -41,18 +41,18 @@ COPY --from=builder /code/requirements.txt .
 RUN pip install --root-user-action ignore --disable-pip-version-check --upgrade -r requirements.txt
 
 # add the entrypoint which will be executed
-COPY scripts/entrypoint.sh /entrypoint.sh
+COPY Dockerfile.assets/entrypoint.sh /entrypoint.sh
 RUN chmod 0777 /entrypoint.sh
 
 # default configuration.
-COPY scripts/config.default.yaml /etc/t4search/config.yaml
+COPY Dockerfile.assets/config.default.yaml /etc/t4search/config.yaml
 
 # configures cron
-COPY scripts/cronjob /etc/cron.d/cronjob
+COPY Dockerfile.assets/cronjob /etc/cron.d/cronjob
 RUN chmod 0644 /etc/cron.d/cronjob
 RUN crontab /etc/cron.d/cronjob
 RUN touch /var/log/cron.log
-COPY scripts/cronrun.sh /cronrun.sh
+COPY Dockerfile.assets/cronrun.sh /cronrun.sh
 RUN chmod 0777 /cronrun.sh
 
 USER appuser

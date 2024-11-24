@@ -2,10 +2,21 @@
 r"""
 
 """
+import os
 import logging
 import typing as t
 import loggext
-from configlib import config
+import configlib
+
+
+def load_configuration() -> None:
+    configlib.config.update(
+        configlib.find_and_load_all(
+            "/etc/t4search/config.{yml,yaml}",
+            os.getenv("CONFIG_FILE", default=""),
+            places=[],
+        )
+    )
 
 
 SHORT_LOGGING_FORMAT = "{asctime} | {levelname:.3} | {name:<30} | {message}"
@@ -13,12 +24,12 @@ LONG_LOGGING_FORMAT = "{asctime} | {levelname:.3} | {name} | {module} | {funcNam
 DEFAULT_DATEFORMAT = "%Y-%m-%d %H:%M:%S"
 
 
-def configure() -> None:
+def configure_logging() -> None:
     handlers: t.List[logging.Handler] = []
 
     logging_format = _get_format()
     date_format = DEFAULT_DATEFORMAT
-    level = getattr(logging, config.get('logging', 'level', converter=str.upper, fallback="INFO"))
+    level = getattr(logging, configlib.config.get('logging', 'level', converter=str.upper, fallback="INFO"))
 
     if loggext.is_running_in_shell():
         handlers.append(
@@ -39,7 +50,7 @@ def configure() -> None:
 
 
 def _get_format() -> str:
-    fmt = config.get('logging', 'format', fallback="@SHORT")
+    fmt = configlib.config.get('logging', 'format', fallback="@SHORT")
     if fmt == "@SHORT":
         return SHORT_LOGGING_FORMAT
     elif fmt == "@LONG":

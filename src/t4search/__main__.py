@@ -2,11 +2,9 @@
 r"""
 
 """
-import os
 import importlib
 import typing as t
 import argparse as ap
-import configlib
 try:
     import better_exceptions
 except ModuleNotFoundError:
@@ -23,13 +21,11 @@ sync_parser = subparsers.add_parser(name="sync", formatter_class=ap.ArgumentDefa
 
 
 def main(argv: t.List[str] = None) -> int:
-    from .logging import configure as configure_logging
+    from .conf import load_configuration, configure_logging
 
     arguments = vars(parser.parse_args(argv))
     __main__ = arguments.pop('__main__')
-    config_file = os.getenv("CONFIG_FILE")
-    if config_file:
-        configlib.config.update(configlib.load(config_file))
+    load_configuration()
     configure_logging()
     submodule = importlib.import_module(f".{__main__}", package=__package__)
     submodule.__main__(**arguments)

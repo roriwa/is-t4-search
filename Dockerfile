@@ -20,7 +20,7 @@ WORKDIR /code
 VOLUME ["/data"]
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y cron && \
+    apt-get install --no-install-recommends -y cron curl && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

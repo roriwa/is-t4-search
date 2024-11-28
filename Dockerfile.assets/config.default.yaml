@@ -5,5 +5,5 @@ chroma:
   host: 0.0.0.0
   port: 9010
 logging:
-  format: @SHORT
+  format: "@SHORT"
   level: INFO

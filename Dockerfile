@@ -24,18 +24,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
-ARG UID=10001
-RUN adduser \
-   --disabled-password \
-   --gecos "" \
-   --home "/nonexistent" \
-   --shell "/sbin/nologin" \
-   --no-create-home \
-   --uid "${UID}" \
-   appuser
-
 # add and install dependencies
 COPY --from=builder /code/requirements.txt .
 RUN pip install --root-user-action ignore --disable-pip-version-check --upgrade -r requirements.txt
@@ -54,8 +42,6 @@ RUN crontab /etc/cron.d/cronjob
 RUN touch /var/log/cron.log
 COPY Dockerfile.assets/cronrun.sh /cronrun.sh
 RUN chmod 0777 /cronrun.sh
-
-USER appuser
 
 # copy or python-module
 COPY src/ /opt/src/

@@ -15,7 +15,10 @@ def load_configuration() -> None:
             "/etc/t4search/config.{yml,yaml}",
             os.getenv("CONFIG_FILE", default=""),
             places=[],
-        )
+        ),
+    )
+    configlib.config.update(
+        configlib.loading.load_env(prefix="T4SEARCH")
     )
 
 

@@ -36,8 +36,8 @@ chroma:
   host: "0.0.0.0"
   port: 9010
 logging:
-  level: DEBUG | INFO | WARNING | ERROR | CRITICAL
-  format: @SHORT | @LONG | "CUSTOM"
+  level: # DEBUG | INFO | WARNING | ERROR | CRITICAL
+  format: # "@SHORT" | "@LONG" | "CUSTOM"
 ```
 
 ## developers
@@ -46,6 +46,12 @@ logging:
 # initial setup
 pip3 install -U pipenv
 PIPENV_VENV_IN_PROJECT=1 pipenv install --dev
+```
+
+when starting, don't forget to have a chroma server running
+
+```shell
+chomra run --port 8000 --path ./chroma_data --log-path ./chroma.log
 ```
 
 ### starting (normal)

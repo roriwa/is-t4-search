@@ -20,9 +20,49 @@ def query(
         parties: t.List[str] = fastapi.Query(default_factory=list),
 ) -> t.List[QueryResponseModel]:
     dates: t.List[DateRange] = list(map(DateRange.from_string, dates))
+
+    result = search(start_date=dates[0], end_date=dates[1], parties=parties, person_ids=persons)
     return []
 
 
 def __main__(**kwargs):
     import uvicorn, configlib
     uvicorn.run(app=api, **configlib.config.get('api', fallback={}), **kwargs)
+
+
+
+def search(query_text=None, start_date=None, end_date=None, parties=[], person_ids=[]):
+    # Keyword suche
+
+    # ands = []
+    filters = {}
+
+    if len(parties):
+        filters['party'] = {"$in": parties}
+    
+    if len(person_ids):
+        filters['speaker'] = {"$in": person_ids}
+
+    if start_date:
+        filters['date'] = {"$gte": start_date}
+        
+    if not len(filters):
+        filters = None
+
+
+    where_obj = {}
+    if len(filters) > 1:
+        where_obj["$and"] = []
+        for key, value in filters.items():
+            where_obj["$and"].append({key: value})
+    else:
+        where_obj = filters
+
+
+    protokolle_coll = chroma_client.get_collection(name="protokolle_coll")
+
+    return protokolle_coll.query(
+        query_texts=[query_text],
+        where=where_obj,
+        n_results=5
+    )

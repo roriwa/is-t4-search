@@ -3,6 +3,7 @@ r"""
 
 """
 import chromadb
+import pymongo
 from configlib import config
 
 
@@ -13,4 +14,10 @@ def create_chroma_client() -> chromadb.ClientAPI:
     return chromadb.HttpClient(
         host=config.getstr('chroma', 'host', fallback="localhost"),
         port=config.getint('chroma', 'port', fallback=8000),
+    )
+
+
+def create_mongo_client() -> pymongo.MongoClient:
+    return pymongo.MongoClient(
+        config.getstr('mongo_uri')
     )

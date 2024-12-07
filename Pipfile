@@ -7,7 +7,7 @@ name = "pypi"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 chromadb = "*"
-pymongo = {extras = ["srv"], version = "*"}
+pymongo = "*"
 loggext = "*"
 config-library = {extras = ["yaml"], version = "*"}
 

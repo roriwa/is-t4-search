@@ -13,7 +13,7 @@ __all__ = ['create_chroma_client']
 def create_chroma_client() -> chromadb.ClientAPI:
     return chromadb.HttpClient(
         host=config.getstr('chroma', 'host', fallback="localhost"),
-        port=config.getint('chroma', 'port', fallback=8000),
+        port=config.getint('chroma', 'port', fallback=9010),
     )
 
 

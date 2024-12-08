@@ -70,7 +70,7 @@ PIPENV_VENV_IN_PROJECT=1 pipenv install --dev
 when starting, don't forget to have a chroma server running
 
 ```shell
-chomra run --port 8000 --path ./chroma_data --log-path ./chroma.log
+chroma run --port 9010 --path ./chroma_data --log-path ./chroma.log
 ```
 
 ### starting (normal)

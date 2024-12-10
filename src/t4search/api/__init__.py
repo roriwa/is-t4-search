@@ -22,7 +22,7 @@ def query(
     dates: t.List[DateRange] = list(map(DateRange.from_string, dates))
 
     result = search(start_date=dates[0], end_date=dates[1], parties=parties, person_ids=persons)
-    return []
+    return result
 
 
 def __main__(**kwargs):

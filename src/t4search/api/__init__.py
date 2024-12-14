@@ -3,7 +3,7 @@ r"""
 
 """
 import typing as t
-import fastapi
+import fastapi, pprint
 from ..core import create_chroma_client, DateRange
 from .models import *
 
@@ -24,7 +24,6 @@ def query(
     dates: t.List[DateRange] = list(map(DateRange.from_string, dates))
 
     wheres = []
-    where = {'$and': wheres}
 
     if persons:
         wheres.append({
@@ -64,6 +63,12 @@ def query(
             '$or': date_ranges,
         })
 
+    where = {'$and': wheres}
+
+    if len(wheres) == 1:
+        where = wheres[0]
+    elif len(wheres) == 0:
+        where = None 
 
     protocols = chroma_client.get_collection(name="protocols")
     results = ChromaResponseObject.model_validate(protocols.query(
@@ -73,6 +78,8 @@ def query(
     ))
 
     n_results = len(results.documents[0])
+
+    pprint.pprint(results)
 
     return [
         QueryResponseModel(
@@ -87,3 +94,41 @@ def query(
 def __main__(**kwargs):
     import uvicorn, configlib
     uvicorn.run(app=api, **configlib.config.get('api', fallback={}), **kwargs)
+
+
+
+def search(query_text=None, start_date=None, end_date=None, parties=[], person_ids=[]):
+    # Keyword suche
+
+    # ands = []
+    filters = {}
+
+    if len(parties):
+        filters['party'] = {"$in": parties}
+    
+    if len(person_ids):
+        filters['speaker'] = {"$in": person_ids}
+
+    if start_date:
+        filters['date'] = {"$gte": start_date}
+        
+    if not len(filters):
+        filters = None
+
+
+    where_obj = {}
+    if len(filters) > 1:
+        where_obj["$and"] = []
+        for key, value in filters.items():
+            where_obj["$and"].append({key: value})
+    else:
+        where_obj = filters
+
+
+    protokolle_coll = chroma_client.get_collection(name="protokolle_coll")
+
+    return protokolle_coll.query(
+        query_texts=[query_text],
+        where=where_obj,
+        n_results=5
+    )

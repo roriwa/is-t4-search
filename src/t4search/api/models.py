@@ -10,7 +10,7 @@ __all__ = ['Metadata', 'QueryResponseModel', 'ChromaResponseObject']
 
 
 class Metadata(BaseModel):
-    speaker: str
+    speaker_id: str
     party: t.Optional[str]
     date: str
 

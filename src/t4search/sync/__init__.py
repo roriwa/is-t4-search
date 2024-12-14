@@ -16,40 +16,38 @@ def __main__():
     # Verbindung zur MongoDB
     client = MongoClient("mongodb://reader:mongoDB_bundestag-projekt@infosys1.f4.htw-berlin.de:27017/bundestag")
     db = client["bundestag"]
-    
-    logging.info("SYNC - CONNECTED TO DB")
 
     # Daten aus den Kollektionen abfragen
-    protokolle = db["protokolle"].find({})
-    abgeordnete = db["mdb_stammdaten"].find({})
+    protocol_data = db["protokolle"].find({})
+    deputy_data = db["mdb_stammdaten"].find({})
 
 
-    rede_ids = []
-    rede_texts = [] # volltext rede
+    speach_ids = []
+    speach_texts = [] # volltext rede
     metadatas = [] # datum und redner id
+
+    chroma_client = create_chroma_client()
 
     # Zerlegen der Sitzung in die einzelnen Reden
     # Danach speichern der einzelnen Redetexte, eine ID und die Metdadaten 
-    for sitzung in protokolle:
-        for id_x, rede_obj in enumerate(sitzung["sitzungsverlauf"]):
-            for rede in rede_obj["rede"]:
+    for sitzung in protocol_data:
+        for id_x, speach_obj in enumerate(sitzung["sitzungsverlauf"]):
+            for speach in speach_obj["rede"]:
 
                 # Rededaten
-                rede["id"] = str(uuid.uuid1()) #zum späteren Identifizieren der gefundenen Rede
-                rede_id = rede["id"] 
-                rede_ids.append(rede_id)
-                rede_texts.append(rede["text"])
+                speach["id"] = str(uuid.uuid1()) #zum späteren Identifizieren der gefundenen Rede
+                speach_id = speach["id"] 
+                speach_ids.append(speach_id)
+                speach_texts.append(speach["text"])
 
                 # Metadaten
-                
                 date_str = sitzung["datum"]
                 date = datetime.strptime(date_str, "%d.%m.%Y").timestamp() 
-                speaker = rede["redner_id"]
-                metadata = {"date": date, "speaker": speaker}
+                
+                speaker = speach["redner_id"]
+                metadata = {"date": date_str, "speaker": speaker}
                 metadatas.append(metadata)
 
-                chroma_client = create_chroma_client()
-
                 # Erstellen und befüllen der Collection 
-                protokolle_coll = chroma_client.create_collection(name="protokolle_coll")
-                protokolle_coll.add(ids=rede_ids, documents=rede_texts, metadatas=metadatas)
+                protokolle_coll = chroma_client.get_or_create_collection(name="protocols")
+                protokolle_coll.upsert(ids=speach_ids, documents=speach_texts, metadatas=metadatas)

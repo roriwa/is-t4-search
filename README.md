@@ -12,6 +12,9 @@ Information Systems - Team 4 - Search Index
 
 ## usage
 
+Go into the directory of your choice. (e.g. `/srv/t4search`).
+Then create the following files.
+
 `docker-compose.yaml`
 ```yaml
 services:
@@ -24,7 +27,23 @@ services:
       - ./config.yaml:/config.yaml
 ```
 
-don't forget to create the `config.yaml`
+`.env`
+```bash
+T4SEARCH_MONGO_URI=
+```
+
+`config.yaml`
+```yaml
+# yes. empty if you don't want to change anything
+```
+
+And finally start it with
+```bash
+docker compose up -d
+```
+
+The API should be available under port 8080.
+Inspect the API-Documentation via `http://localhost:8080/redoc`
 
 ## configuration
 
@@ -36,8 +55,8 @@ chroma:
   host: "0.0.0.0"
   port: 9010
 logging:
-  level: DEBUG | INFO | WARNING | ERROR | CRITICAL
-  format: @SHORT | @LONG | "CUSTOM"
+  level: # DEBUG | INFO | WARNING | ERROR | CRITICAL
+  format: # "@SHORT" | "@LONG" | "CUSTOM"
 ```
 
 ## developers
@@ -46,6 +65,12 @@ logging:
 # initial setup
 pip3 install -U pipenv
 PIPENV_VENV_IN_PROJECT=1 pipenv install --dev
+```
+
+when starting, don't forget to have a chroma server running
+
+```shell
+chroma run --port 9010 --path ./chroma_data --log-path ./chroma.log
 ```
 
 ### starting (normal)

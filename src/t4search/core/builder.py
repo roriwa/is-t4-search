@@ -7,7 +7,7 @@ import pymongo
 from configlib import config
 
 
-__all__ = ['create_chroma_client']
+__all__ = ['create_chroma_client', 'create_mongo_client']
 
 
 def create_chroma_client() -> chromadb.ClientAPI:

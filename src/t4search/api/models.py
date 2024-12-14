@@ -10,20 +10,20 @@ __all__ = ['Metadata', 'QueryResponseModel', 'ChromaResponseObject']
 
 
 class Metadata(BaseModel):
-    person: str
-    party: str
+    speaker: str
+    party: t.Optional[str]
     date: str
 
 
 class QueryResponseModel(BaseModel):
-    mongo_id: int
+    mongo_id: str
     metadata: Metadata
     distances: t.List[float]
 
 
 class ChromaResponseObject(BaseModel):
     documents: t.List[t.List[str]]
-    ids: t.List[t.List[int]]
+    ids: t.List[t.List[str]]
     distances: t.List[t.List[float]]
     uris: t.Optional[t.List[t.List[t.Any]]]
     data: t.Optional[t.List[t.List[t.Any]]]

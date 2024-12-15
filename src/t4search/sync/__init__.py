@@ -6,7 +6,7 @@ import logging
 import typing as t
 from loggext.decorators import add_logging
 from functools import lru_cache
-from datetime import datetime
+import datetime
 from ..core import create_mongo_client, create_chroma_client
 
 
@@ -40,7 +40,7 @@ def __main__():
     for protocol in mongo_protocols_data:
         logging.info("syncing protocol %s", protocol["id"])
 
-        date = datetime.strptime(protocol['datum'], '%d.%m.%Y').timestamp() # chroma does not accept "date" datatypes => float better for comparison
+        date = datetime.datetime.strptime(protocol['datum'], '%d.%m.%Y').date().toordinal()
 
         for session_index, session in enumerate(protocol["sitzungsverlauf"]):
             logging.info("syncing session %d", session_index)

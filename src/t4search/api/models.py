@@ -12,13 +12,13 @@ __all__ = ['Metadata', 'QueryResponseModel', 'ChromaResponseObject']
 class Metadata(BaseModel):
     speaker_id: str
     party: t.Optional[str]
-    date: str
+    date: float
 
 
 class QueryResponseModel(BaseModel):
     mongo_id: str
     metadata: Metadata
-    distances: t.List[float]
+    distances: float
 
 
 class ChromaResponseObject(BaseModel):

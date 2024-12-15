@@ -4,6 +4,7 @@ r"""
 """
 import typing as t
 import fastapi
+from datetime import datetime
 from ..core import create_chroma_client, DateRange
 from .models import *
 
@@ -43,6 +44,8 @@ def query(
     if dates:
         date_ranges = []
         for date in dates:
+            date.start = datetime.strptime(str(date.start), "%d.%m.%Y").timestamp() if date.start else date.start
+            date.start = datetime.strptime(str(date.end), "%d.%m.%Y").timestamp() if date.end else date.end
             if date.start and date.end:
                 date_ranges.append({
                     '$and': [
@@ -63,6 +66,13 @@ def query(
         wheres.append({
             '$or': date_ranges,
         })
+    
+    where = {'$and': wheres}
+
+    if len(wheres) == 1:
+        where = wheres[0]
+    elif len(wheres) == 0:
+        where = None 
 
 
     protocols = chroma_client.get_collection(name="protocols")
@@ -71,6 +81,8 @@ def query(
         where=where,
         n_results=limit,
     ))
+
+    print(results)
 
     n_results = len(results.documents[0])
 

@@ -25,7 +25,6 @@ def __main__():
 
     logging.info("creating chroma client")
     chroma_client = create_chroma_client()
-    chroma_client.delete_collection(name="protocols")
     chroma_protocol_collection = chroma_client.get_or_create_collection(name="protocols")
 
     # speaker fetching
@@ -43,7 +42,7 @@ def __main__():
         date = datetime.datetime.strptime(protocol['datum'], '%d.%m.%Y').date().toordinal()
 
         for session_index, session in enumerate(protocol["sitzungsverlauf"]):
-            logging.info("syncing session %d", session_index)
+            logging.info("syncing protocol %s session %d", protocol["id"], session_index)
 
             ids: t.List[str] = []
             documents: t.List[str] = []
@@ -51,7 +50,7 @@ def __main__():
 
             for speach_index, speach in enumerate(session["rede"]):
                 ids.append(f"{protocol['id']}#{session_index}#{speach_index}")
-                logging.info("syncing session #%d - speach #%d", session_index, speach_index)
+                logging.info("syncing %s - session #%d - speach #%d", protocol["id"], session_index, speach_index)
                 documents.append(speach['text'])
                 speaker_id = speach['redner_id']
                 speaker = get_speaker_by_id(speaker_id)

@@ -19,6 +19,7 @@ class QueryResponseModel(BaseModel):
     mongo_id: str
     metadata: Metadata
     distances: float
+    document: t.Optional[str]
 
 
 class ChromaResponseObject(BaseModel):

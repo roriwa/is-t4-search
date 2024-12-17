@@ -87,6 +87,7 @@ def query(
             mongo_id=results.ids[0][i],
             metadata=results.metadatas[0][i],
             distances=results.distances[0][i],
+            document=results.documents[0][i],
         )
         for i in range(n_results)
     ]

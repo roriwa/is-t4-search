@@ -65,6 +65,8 @@ logging:
 # initial setup
 pip3 install -U pipenv
 PIPENV_VENV_IN_PROJECT=1 pipenv install --dev
+./run reset
+./run init
 ```
 
 when starting, don't forget to have a chroma server running

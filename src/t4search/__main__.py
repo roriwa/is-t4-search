@@ -19,6 +19,9 @@ api_parser = subparsers.add_parser(name="api", formatter_class=ap.ArgumentDefaul
 
 sync_parser = subparsers.add_parser(name="sync", formatter_class=ap.ArgumentDefaultsHelpFormatter)
 
+reset_parser = subparsers.add_parser(name="reset", formatter_class=ap.ArgumentDefaultsHelpFormatter)
+
+init_parser = subparsers.add_parser(name="init", formatter_class=ap.ArgumentDefaultsHelpFormatter)
 
 def main(argv: t.List[str] = None) -> int:
     from .conf import load_configuration, configure_logging

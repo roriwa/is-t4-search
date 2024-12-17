@@ -16,6 +16,27 @@ FROM base AS runtime
 LABEL description="Information Systems - Team 4 - Search Index"
 LABEL repository="https://github.com/roriwa/is-t4-search"
 
+# ----- congfiguration options -----
+
+# permanent data storage
+ENV DATA_DIR "/data"
+# the port where chroma should run on
+ENV CHROMA_PORT 9010
+# where the configuration file is located
+ENV CONFIG_FILE "/config.yaml"
+
+# ----------------------------------
+
+# adds our module to the path to allow execution via `python3 -m`
+ENV PYTHONPATH "$PYTHONPATH:/opt/src"
+# Enable UTF-8 mode for operating system interfaces
+ENV PYTHONUTF8 1
+# Prevents Python from writing pyc files.
+ENV PYTHONDONTWRITEBYTECODE 1
+# Keeps Python from buffering stdout and stderr to avoid situations where
+# the application crashes without emitting any logs due to buffering.
+ENV PYTHONUNBUFFERED 1
+
 WORKDIR /code
 VOLUME ["/data"]
 
@@ -46,26 +67,8 @@ RUN chmod 0777 /cronrun.sh
 # copy or python-module
 COPY src/ /opt/src/
 
-# adds our module to the path to allow execution via `python3 -m`
-ENV PYTHONPATH "$PYTHONPATH:/opt/src"
-# Enable UTF-8 mode for operating system interfaces
-ENV PYTHONUTF8 1
-# Prevents Python from writing pyc files.
-ENV PYTHONDONTWRITEBYTECODE 1
-# Keeps Python from buffering stdout and stderr to avoid situations where
-# the application crashes without emitting any logs due to buffering.
-ENV PYTHONUNBUFFERED 1
-
-# ----- congfiguration options -----
-
-# permanent data storage
-ENV DATA_DIR "/data"
-# the port where chroma should run on
-ENV CHROMA_PORT 9010
-# where the configuration file is located
-ENV CONFIG_FILE "/config.yaml"
-
-# ----------------------------------
+# init project
+RUN python3 -m t4search init
 
 # where our api-server will run on
 EXPOSE 80

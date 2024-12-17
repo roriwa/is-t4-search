@@ -25,7 +25,6 @@ def query(
     dates: t.List[DateRange] = list(map(DateRange.from_string, dates))
 
     wheres = []
-    where = {'$and': wheres}
 
     if persons:
         wheres.append({
@@ -44,22 +43,20 @@ def query(
     if dates:
         date_ranges = []
         for date in dates:
-            date.start = datetime.strptime(str(date.start), "%d.%m.%Y").timestamp() if date.start else date.start
-            date.start = datetime.strptime(str(date.end), "%d.%m.%Y").timestamp() if date.end else date.end
             if date.start and date.end:
                 date_ranges.append({
                     '$and': [
-                        { 'date': { '$gte': date.start } },
-                        { 'date': { '$lte': date.end } },
+                        { 'date': { '$gte': date.start.toordinal() } },
+                        { 'date': { '$lte': date.end.toordinal() } },
                     ],
                 })
             elif date.start:
                 date_ranges.append({
-                    'date': { '$gte': date.start },
+                    'date': { '$gte': date.start.toordinal() },
                 })
             elif date.end:
                 date_ranges.append({
-                    'date': { '$lte': date.end }
+                    'date': { '$lte': date.end.toordinal() },
                 })
             else:
                 raise
@@ -72,8 +69,7 @@ def query(
     if len(wheres) == 1:
         where = wheres[0]
     elif len(wheres) == 0:
-        where = None 
-
+        where = None
 
     protocols = chroma_client.get_collection(name="protocols")
     results = ChromaResponseObject.model_validate(protocols.query(
@@ -91,6 +87,7 @@ def query(
             mongo_id=results.ids[0][i],
             metadata=results.metadatas[0][i],
             distances=results.distances[0][i],
+            document=results.documents[0][i],
         )
         for i in range(n_results)
     ]

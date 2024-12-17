@@ -10,6 +10,7 @@ chromadb = "*"
 pymongo = "*"
 loggext = "*"
 config-library = {extras = ["yaml"], version = "*"}
+nltk = "*"
 
 [dev-packages]
 better-exceptions = "*"

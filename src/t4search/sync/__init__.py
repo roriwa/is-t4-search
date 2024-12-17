@@ -4,14 +4,19 @@ r"""
 """
 import logging
 import typing as t
-from loggext.decorators import add_logging
 from functools import lru_cache
 import datetime
+import nltk
+from loggext.decorators import add_logging
 from ..core import create_mongo_client, create_chroma_client
 
 
 def __main__():
     logging.info("initiating sync")
+
+    # helper
+
+    sent_tokenizer = nltk.PunktTokenizer(lang="german")
 
     # creating connections
 
@@ -49,15 +54,19 @@ def __main__():
             metadatas: t.List[t.Dict[str, t.Any]] = []
 
             for speach_index, speach in enumerate(session["rede"]):
-                ids.append(f"{protocol['id']}#{session_index}#{speach_index}")
                 logging.info("syncing %s - session #%d - speach #%d", protocol["id"], session_index, speach_index)
-                documents.append(speach['text'])
+
                 speaker_id = speach['redner_id']
                 speaker = get_speaker_by_id(speaker_id)
-                metadatas.append(dict(
-                    speaker_id=speaker_id,
-                    party=speaker['fraktion'] if speaker else '', # chroma does not accept None values
-                    date=date,
-                ))
+
+                for sentence_index, sentence in enumerate(sent_tokenizer.tokenize(speach["text"])):
+                    ids.append(f"{protocol['id']}#{session_index}#{speach_index}#{sentence_index}")
+                    logging.info("Sentence: %r", sentence)
+                    documents.append(sentence)
+                    metadatas.append(dict(
+                        speaker_id=speaker_id,
+                        party=speaker['fraktion'] if speaker else '', # chroma does not accept None values
+                        date=date,
+                    ))
 
             chroma_protocol_collection.upsert(ids=ids, documents=documents, metadatas=metadatas)

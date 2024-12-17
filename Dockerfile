@@ -67,6 +67,9 @@ ENV CONFIG_FILE "/config.yaml"
 
 # ----------------------------------
 
+# init project
+RUN python3 -m t4search init
+
 # where our api-server will run on
 EXPOSE 80
 

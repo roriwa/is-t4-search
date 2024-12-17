@@ -49,32 +49,16 @@ def __main__():
             documents: t.List[str] = []
             metadatas: t.List[t.Dict[str, t.Any]] = []
 
-            chunking = "sentence"
-            if chunking == "sentence":
-                for speach_index, speach in enumerate(session["rede"]):
-                    speach_chunks = speach["text"].split(".")
-                    for chunk_index, chunk in enumerate(speach_chunks):
-                        ids.append(f"{protocol['id']}#{session_index}#{speach_index}#{chunk_index}")
-                        logging.info("syncing session #%d - speach #%d", session_index, speach_index)
-                        documents.append(chunk)
-                        speaker_id = speach['redner_id']
-                        speaker = get_speaker_by_id(speaker_id)
-                        metadatas.append(dict(
-                            speaker_id=speaker_id,
-                            party=speaker['fraktion'] if speaker else '', # chroma does not accept None values
-                            date=date,
-                        ))
-            else: 
-                for speach_index, speach in enumerate(session["rede"]):
-                    ids.append(f"{protocol['id']}#{session_index}#{speach_index}")
-                    logging.info("syncing session #%d - speach #%d", session_index, speach_index)
-                    documents.append(speach['text'])
-                    speaker_id = speach['redner_id']
-                    speaker = get_speaker_by_id(speaker_id)
-                    metadatas.append(dict(
-                        speaker_id=speaker_id,
-                        party=speaker['fraktion'] if speaker else '', # chroma does not accept None values
-                        date=date,
-                    ))
+            for speach_index, speach in enumerate(session["rede"]):
+                ids.append(f"{protocol['id']}#{session_index}#{speach_index}")
+                logging.info("syncing session #%d - speach #%d", session_index, speach_index)
+                documents.append(speach['text'])
+                speaker_id = speach['redner_id']
+                speaker = get_speaker_by_id(speaker_id)
+                metadatas.append(dict(
+                    speaker_id=speaker_id,
+                    party=speaker['fraktion'] if speaker else '', # chroma does not accept None values
+                    date=date,
+                ))
 
             chroma_protocol_collection.upsert(ids=ids, documents=documents, metadatas=metadatas)

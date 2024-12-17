@@ -41,6 +41,8 @@ def __main__():
 
     # syncing
 
+    logging.info("Starting actual sync")
+
     for protocol in mongo_protocols_data:
         logging.info("syncing protocol %s", protocol["id"])
 

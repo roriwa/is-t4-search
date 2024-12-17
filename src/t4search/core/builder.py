@@ -14,6 +14,7 @@ def create_chroma_client() -> chromadb.ClientAPI:
     return chromadb.HttpClient(
         host=config.getstr('chroma', 'host', fallback="localhost"),
         port=config.getint('chroma', 'port', fallback=9010),
+        settings=chromadb.Settings(anonymized_telemetry=False),
     )
 
 

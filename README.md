@@ -29,7 +29,7 @@ services:
 
 `.env`
 ```bash
-T4SEARCH_MONGO_URI=
+T4SEARCH_MONGO_URI=#TODO
 ```
 
 `config.yaml`
@@ -47,15 +47,27 @@ Inspect the API-Documentation via `http://localhost:8080/redoc`
 
 ## configuration
 
+example!!
+
 ```yaml
 api:
+  # which host to bind to
   host: "0.0.0.0"
+  # which port to bind to
   port: 8000
 chroma:
+  # on which host the chroma-db runs
   host: "0.0.0.0"
+  # on which port the chroma-db runs
   port: 9010
+sync:
+  # whether to also save the content of documents instead of just their embeddings
+  # warning: increases disk usage
+  save_documents: false
 logging:
+  # logging details
   level: # DEBUG | INFO | WARNING | ERROR | CRITICAL
+  # logging format
   format: # "@SHORT" | "@LONG" | "CUSTOM"
 ```
 

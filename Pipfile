@@ -11,6 +11,7 @@ pymongo = "*"
 loggext = "*"
 config-library = {extras = ["yaml"], version = "*"}
 nltk = "*"
+filelock = "*"
 
 [dev-packages]
 better-exceptions = "*"

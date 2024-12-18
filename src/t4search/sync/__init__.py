@@ -7,10 +7,15 @@ import typing as t
 from functools import lru_cache
 import datetime
 import nltk
+import filelock
 from loggext.decorators import add_logging
 from ..core import create_mongo_client, create_chroma_client
 
 
+sync_lock = filelock.FileLock("sync.lock")
+
+
+@sync_lock
 def __main__():
     logging.info("initiating sync")
 

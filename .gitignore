@@ -2,4 +2,7 @@
 /.idea/
 /tmp/
 chroma.log
-/chroma_data/
+chroma_data
+sync.lock
+
+**/__pycache__

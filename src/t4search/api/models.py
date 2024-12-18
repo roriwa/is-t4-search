@@ -23,7 +23,7 @@ class QueryResponseModel(BaseModel):
 
 
 class ChromaResponseObject(BaseModel):
-    documents: t.List[t.List[str]]
+    documents: t.List[t.List[t.Optional[str]]]
     ids: t.List[t.List[str]]
     distances: t.List[t.List[float]]
     uris: t.Optional[t.List[t.List[t.Any]]]

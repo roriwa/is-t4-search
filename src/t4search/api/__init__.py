@@ -4,7 +4,7 @@ r"""
 """
 import typing as t
 import fastapi
-from datetime import datetime
+from pydantic import ValidationError
 from ..core import create_chroma_client, DateRange
 from .models import *
 
@@ -22,7 +22,10 @@ def query(
         parties: t.List[str] = fastapi.Query(default_factory=list),
         limit: t.Optional[int] = fastapi.Query(default=10),
 ) -> t.List[QueryResponseModel]:
-    dates: t.List[DateRange] = list(map(DateRange.from_string, dates))
+    try:
+        dates: t.List[DateRange] = list(map(DateRange.from_string, dates))
+    except ValidationError as e:
+        raise fastapi.exceptions.RequestValidationError(e.errors())
 
     wheres = []
 

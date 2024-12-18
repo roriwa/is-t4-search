@@ -2,11 +2,15 @@
 r"""
 
 """
+import logging
+from pathlib import Path
 from ..core import create_chroma_client
 
 
 def __main__():
+    logging.info("resetting chroma")
     chroma_client = create_chroma_client()
+    chroma_client.reset()
 
-    for collection in chroma_client.list_collections():
-        chroma_client.delete_collection(name=collection.name)
+    logging.info("removing synced.json")
+    Path.cwd().joinpath("synced.json").unlink(missing_ok=True)

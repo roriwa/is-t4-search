@@ -4,5 +4,6 @@
 chroma.log
 chroma_data
 sync.lock
+synced.json
 
 **/__pycache__

@@ -9,9 +9,11 @@ from pathlib import Path
 from functools import lru_cache
 import datetime
 import nltk
+import chromadb
 import filelock
+from configlib import config
 from loggext.decorators import add_logging
-from ..core import create_mongo_client, create_chroma_client
+from ..core import create_mongo_client, create_chroma_client, create_chroma_embedding_function
 
 
 sync_lock = filelock.FileLock("sync.lock")
@@ -20,6 +22,10 @@ sync_lock = filelock.FileLock("sync.lock")
 @sync_lock
 def __main__():
     logging.info("initiating sync")
+
+    save_documents = config.getbool("sync", "save_documents", fallback=False)
+    if save_documents:
+        logging.warning("sync will save documents which will increase disk usage")
 
     # tokenizer
 
@@ -39,6 +45,7 @@ def __main__():
     logging.info("creating chroma client")
     chroma_client = create_chroma_client()
     chroma_protocol_collection = chroma_client.get_or_create_collection(name="protocols")
+    embedding_function = create_chroma_embedding_function()
 
     # loading synced
 
@@ -80,6 +87,7 @@ def __main__():
 
             ids: t.List[str] = []
             documents: t.List[str] = []
+            embeddings: chromadb.Embeddings = []
             metadatas: t.List[t.Dict[str, t.Any]] = []
 
             for speach_index, speach in enumerate(session["rede"]):
@@ -88,17 +96,22 @@ def __main__():
                 speaker_id = speach['redner_id']
                 speaker = get_speaker_by_id(speaker_id)
 
+                sentences: t.List[str] = []
+
                 for sentence_index, sentence in enumerate(sent_tokenizer.tokenize(speach["text"])):
                     ids.append(f"{protocol_id}#{session_index}#{speach_index}#{sentence_index}")
                     logging.info("Sentence: %r", sentence)
-                    documents.append(sentence)
+                    sentences.append(sentence)
                     metadatas.append(dict(
                         speaker_id=speaker_id,
                         party=speaker['fraktion'] if speaker else '', # chroma does not accept None values
                         date=date,
                     ))
 
-            chroma_protocol_collection.upsert(ids=ids, documents=documents, metadatas=metadatas)
+                documents.extend(sentences)
+                embeddings.extend(embedding_function(input=sentences))
+
+            chroma_protocol_collection.upsert(ids=ids, documents=documents if save_documents else None, embeddings=embeddings, metadatas=metadatas)
 
         synced_protocols.append(protocol_id)
 

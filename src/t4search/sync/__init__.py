@@ -83,7 +83,7 @@ def __main__():
         date = datetime.datetime.strptime(protocol['datum'], '%d.%m.%Y').date().toordinal()
 
         for session_index, session in enumerate(protocol["sitzungsverlauf"]):
-            logging.info("syncing protocol %s session %d", protocol_id, session_index)
+            logging.info("syncing protocol %s - session #%d", protocol_id, session_index)
 
             ids: t.List[str] = []
             documents: t.List[str] = []
@@ -100,7 +100,7 @@ def __main__():
 
                 for sentence_index, sentence in enumerate(sent_tokenizer.tokenize(speach["text"])):
                     ids.append(f"{protocol_id}#{session_index}#{speach_index}#{sentence_index}")
-                    logging.info("Sentence: %r", sentence)
+                    logging.debug("Sentence: %r", sentence)
                     sentences.append(sentence)
                     metadatas.append(dict(
                         speaker_id=speaker_id,
@@ -108,9 +108,11 @@ def __main__():
                         date=date,
                     ))
 
+                logging.info("syncing %d - session #%d - speach #%d - generating embeddings", protocol_id, session_index, speach_index)
                 documents.extend(sentences)
                 embeddings.extend(embedding_function(input=sentences))
 
+            logging.info("protocol %s - session #%d - upsert", protocol_id, session_index)
             chroma_protocol_collection.upsert(ids=ids, documents=documents if save_documents else None, embeddings=embeddings, metadatas=metadatas)
 
         synced_protocols.append(protocol_id)

@@ -58,9 +58,9 @@ COPY Dockerfile.assets/config.default.yaml /etc/t4search/config.yaml
 
 # configures cron
 COPY Dockerfile.assets/cronjob /etc/cron.d/cronjob
-RUN chmod 0644 /etc/cron.d/cronjob
-RUN crontab /etc/cron.d/cronjob
-RUN touch /var/log/cron.log
+RUN chmod 0644 /etc/cron.d/cronjob && \
+    crontab /etc/cron.d/cronjob && \
+    touch /var/log/cron.log
 COPY Dockerfile.assets/cronrun.sh /cronrun.sh
 RUN chmod 0777 /cronrun.sh
 

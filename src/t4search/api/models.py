@@ -16,7 +16,7 @@ class Metadata(BaseModel):
 
 
 class QueryResponseModel(BaseModel):
-    protocol_id: str
+    protocol_id: int
     session_index: int
     speach_index: int
     sentence_index: int

@@ -109,7 +109,7 @@ def __main__():
                     sentences.append(sentence)
                     metadatas.append(dict(
                         speaker_id=speaker_id,
-                        party=speaker['fraktion'] if speaker else '', # chroma does not accept None values
+                        party=speaker['fraktion'].casefold() if speaker else '', # chroma does not accept None values
                         date=date,
                     ))
 

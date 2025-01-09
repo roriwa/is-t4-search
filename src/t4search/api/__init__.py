@@ -13,15 +13,35 @@ api = fastapi.FastAPI(title="T4Search API")
 chroma_client = create_chroma_client()
 
 
-@api.get("/api/query", response_model=t.List[QueryResponseModel])
+@api.post("/api/query", response_model=t.List[QueryResponseModel])
 def query(
-        query_text: str = fastapi.Query(),
-        # topics: t.List[str] = fastapi.Query(default_factory=list),
-        persons: t.List[str] =  fastapi.Query(default_factory=list),
-        dates: t.List[str] = fastapi.Query(default_factory=list),
-        parties: t.List[str] = fastapi.Query(default_factory=list),
-        limit: t.Optional[int] = fastapi.Query(default=10),
+        query_text: str = fastapi.Body(),
+        # topics: t.List[str] = fastapi.Body(default_factory=list),
+        persons: t.List[str] =  fastapi.Body(default_factory=list),
+        dates: t.List[str] = fastapi.Body(default_factory=list),
+        parties: t.List[str] = fastapi.Body(default_factory=list),
+        limit: t.Optional[int] = fastapi.Body(default=10),
 ) -> t.List[QueryResponseModel]:
+    r"""
+    ## `query_text`:
+    Query text to search for
+
+    ## `persons`
+    List of speaker (id) that are allowed
+
+    ## `dates`
+    Examples:
+    - `2021-01-01:2022-01-01` (between two dates)
+    - `2021-01-01:` (after a date)
+    - `:2022-01-01` (before a date)
+    - `2022-01-01` (specific date)
+
+    ## `parties`:
+    List of parties (names) that are allowed
+
+    ## `limit`:
+    Maximum Number of results to return
+    """
     try:
         dates: t.List[DateRange] = list(map(DateRange.from_string, dates))
     except ValidationError as e:
@@ -39,7 +59,7 @@ def query(
     if parties:
         wheres.append({
             'party': {
-                '$in': parties,
+                '$in': [p.casefold() for p in parties],
             }
         })
 

@@ -43,11 +43,3 @@ class DateRange(pydantic.BaseModel):
                 return DateRange(start=start, end=end)
             else:
                 return DateRange(start=start, end=end) if start < end else DateRange(start=end, end=start)
-
-
-if __name__ == '__main__':
-    print(DateRange.from_string("2020-01-10"))
-    print(DateRange.from_string("2020-01-10:"))
-    print(DateRange.from_string(":2020-01-10"))
-    print(DateRange.from_string("2019-01-01:2020-01-10"))
-    print(DateRange.from_string("2020-01-01:2019-01-10"))

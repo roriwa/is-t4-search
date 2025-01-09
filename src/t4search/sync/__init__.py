@@ -72,7 +72,7 @@ def __main__():
     logging.info("Starting actual sync")
 
     for protocol in mongo_protocols_data:
-        protocol_id = protocol["id"]
+        protocol_id: int = protocol["id"]
 
         if protocol_id in synced_protocols:
             logging.info("Skipping protocol %s as it's already synced", protocol_id)

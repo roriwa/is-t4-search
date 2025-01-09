@@ -63,9 +63,12 @@ def query(
                 })
             else:
                 raise
-        wheres.append({
-            '$or': date_ranges,
-        })
+        if len(date_ranges) == 1:
+            wheres.append(date_ranges[0])
+        else:
+            wheres.append({
+                '$or': date_ranges,
+            })
     
     where = {'$and': wheres}
 

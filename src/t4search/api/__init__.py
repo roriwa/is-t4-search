@@ -11,16 +11,15 @@ from .models import *
 
 
 api = fastapi.FastAPI(title="T4Search API")
-chroma_client = create_chroma_client()
 
 
 @api.post("/api/query", response_model=t.List[QueryResponseModel])
 def api_query(
-        query_text: str = fastapi.Body(),
-        topics: t.List[str] = fastapi.Body(default_factory=list),
-        persons: t.List[str] =  fastapi.Body(default_factory=list),
-        dates: t.List[str] = fastapi.Body(default_factory=list),
-        parties: t.List[str] = fastapi.Body(default_factory=list),
+        query_text: str = fastapi.Body(examples=[""]),
+        topics: t.List[str] = fastapi.Body(default_factory=list, examples=[[]]),
+        persons: t.List[str] =  fastapi.Body(default_factory=list, examples=[[]]),
+        dates: t.List[str] = fastapi.Body(default_factory=list, examples=[[]]),
+        parties: t.List[str] = fastapi.Body(default_factory=list, examples=[[]]),
         limit: t.Optional[int] = fastapi.Body(default=10),
 ) -> t.List[QueryResponseModel]:
     r"""
@@ -50,6 +49,8 @@ def api_query(
         dates: t.List[DateRange] = list(map(DateRange.from_string, dates))
     except ValidationError as e:
         raise fastapi.exceptions.RequestValidationError(e.errors())
+
+    chroma_client = create_chroma_client()
 
     wheres = []
 
@@ -93,7 +94,7 @@ def api_query(
             wheres.append({
                 '$or': date_ranges,
             })
-    
+
     where = {'$and': wheres}
 
     if len(wheres) == 1:

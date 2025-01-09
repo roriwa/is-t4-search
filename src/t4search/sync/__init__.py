@@ -13,7 +13,7 @@ import chromadb
 import filelock
 from configlib import config
 from loggext.decorators import add_logging
-from ..core import create_mongo_client, create_chroma_client, create_chroma_embedding_function
+from ..core import create_mongo_client, create_chroma_client, create_chroma_embedding_function, create_vector_id
 
 
 sync_lock = filelock.FileLock("sync.lock")
@@ -99,7 +99,12 @@ def __main__():
                 sentences: t.List[str] = []
 
                 for sentence_index, sentence in enumerate(sent_tokenizer.tokenize(speach["text"])):
-                    ids.append(f"{protocol_id}#{session_index}#{speach_index}#{sentence_index}")
+                    ids.append(create_vector_id(
+                        protocol_id=protocol_id,
+                        session_index=session_index,
+                        speach_index=speach_index,
+                        sentence_index=sentence_index,
+                    ))
                     logging.debug("Sentence: %r", sentence)
                     sentences.append(sentence)
                     metadatas.append(dict(

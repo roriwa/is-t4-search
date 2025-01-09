@@ -5,7 +5,7 @@ r"""
 import typing as t
 import fastapi
 from pydantic import ValidationError
-from ..core import create_chroma_client, DateRange
+from ..core import create_chroma_client, DateRange, split_vector_id
 from .models import *
 
 
@@ -87,7 +87,7 @@ def query(
 
     return [
         QueryResponseModel(
-            mongo_id=results.ids[0][i],
+            **split_vector_id(results.ids[0][i]),
             metadata=results.metadatas[0][i],
             distances=results.distances[0][i],
             document=results.documents[0][i],

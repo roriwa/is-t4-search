@@ -16,7 +16,10 @@ class Metadata(BaseModel):
 
 
 class QueryResponseModel(BaseModel):
-    mongo_id: str
+    protocol_id: str
+    session_index: int
+    speach_index: int
+    sentence_index: int
     metadata: Metadata
     distances: float
     document: t.Optional[str]

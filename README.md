@@ -60,10 +60,6 @@ chroma:
   host: "0.0.0.0"
   # on which port the chroma-db runs
   port: 9010
-sync:
-  # whether to also save the content of documents instead or just their embeddings
-  # warning: increases disk usage
-  save_documents: false
 logging:
   # logging details
   level: # DEBUG | INFO | WARNING | ERROR | CRITICAL

@@ -11,7 +11,6 @@ import datetime
 import nltk
 import chromadb
 import filelock
-from configlib import config
 from loggext.decorators import add_logging
 from ..core import create_mongo_client, create_chroma_client, create_chroma_embedding_function, create_vector_id
 
@@ -22,10 +21,6 @@ sync_lock = filelock.FileLock("sync.lock")
 @sync_lock
 def __main__():
     logging.info("initiating sync")
-
-    save_documents = config.getbool("sync", "save_documents", fallback=False)
-    if save_documents:
-        logging.warning("sync will save documents which will increase disk usage")
 
     # tokenizer
 
@@ -118,7 +113,7 @@ def __main__():
                 embeddings.extend(embedding_function(input=sentences))
 
             logging.info("protocol %s - session #%d - upsert", protocol_id, session_index)
-            chroma_protocol_collection.upsert(ids=ids, documents=documents if save_documents else None, embeddings=embeddings, metadatas=metadatas)
+            chroma_protocol_collection.upsert(ids=ids, documents=documents, embeddings=embeddings, metadatas=metadatas)
 
         synced_protocols.append(protocol_id)
 

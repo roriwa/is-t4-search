@@ -88,12 +88,18 @@ def __main__():
             for speach_index, speach in enumerate(session["rede"]):
                 logging.info("syncing %d - session #%d - speach #%d", protocol_id, session_index, speach_index)
 
+                text = speach['text']
+
+                if not text:
+                    logging.info("skipping speach cause text is empty")
+                    continue
+
                 speaker_id = speach['redner_id']
                 speaker = get_speaker_by_id(speaker_id)
 
                 sentences: t.List[str] = []
 
-                for sentence_index, sentence in enumerate(sent_tokenizer.tokenize(speach["text"])):
+                for sentence_index, sentence in enumerate(sent_tokenizer.tokenize(text)):
                     ids.append(create_vector_id(
                         protocol_id=protocol_id,
                         session_index=session_index,

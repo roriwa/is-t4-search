@@ -35,7 +35,7 @@ def __main__():
     mongo_protocols_collection = mongo_db.get_collection("protokolle")
     mongo_delegated_collection = mongo_db.get_collection(name='mdb_stammdaten')
 
-    mongo_protocols_data = mongo_protocols_collection.find({})
+    mongo_protocols_data = mongo_protocols_collection.find({}, no_cursor_timeout=True)
 
     logging.info("creating chroma client")
     chroma_client = create_chroma_client()

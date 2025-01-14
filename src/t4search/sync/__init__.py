@@ -31,13 +31,12 @@ def __main__():
 
     logging.info("creating mongo client")
     mongo_client = create_mongo_client()
-    mongo_session = mongo_client.start_session() # necessary for no_cursor_timeout to work
 
     mongo_db = mongo_client.get_database("bundestag")
     mongo_protocols_collection = mongo_db.get_collection("protokolle")
     mongo_delegated_collection = mongo_db.get_collection(name='mdb_stammdaten')
 
-    mongo_protocols_data = mongo_protocols_collection.find(filter=None, no_cursor_timeout=True, session=mongo_session)
+    mongo_protocol_ids: t.List[int] = [doc['id'] for doc in mongo_protocols_collection.find({}, {'id': 1})]
 
     logging.info("creating chroma client")
     chroma_client = create_chroma_client()
@@ -68,8 +67,11 @@ def __main__():
 
     logging.info("Starting actual sync")
 
-    for protocol in mongo_protocols_data:
-        protocol_id: int = protocol["id"]
+    for protocol_id in mongo_protocol_ids:
+        protocol = mongo_protocols_collection.find_one({'id': protocol_id})
+        if protocol is None:
+            logging.error("Protocol %s disappeared", protocol_id)
+            continue
 
         if protocol_id in synced_protocols:
             logging.info("Skipping protocol %s as it's already synced", protocol_id)
@@ -121,11 +123,11 @@ def __main__():
                 embeddings.extend(embedding_function(input=sentences))
 
             logging.info("protocol %s - session #%d - upsert", protocol_id, session_index)
-            chroma_protocol_collection.upsert(ids=ids, documents=documents, embeddings=embeddings, metadatas=metadatas)
+            if ids:
+                chroma_protocol_collection.upsert(ids=ids, documents=documents, embeddings=embeddings, metadatas=metadatas)
 
         synced_protocols.append(protocol_id)
 
         logging.info("writing synced protocols to %s", synced_protocols_file)
         with open(synced_protocols_file, "w") as f:
             json.dump(synced_protocols, fp=f)
-    mongo_session.end_session()

@@ -5,12 +5,7 @@ r"""
 import importlib
 import typing as t
 import argparse as ap
-try:
-    import better_exceptions
-except ModuleNotFoundError:
-    pass
-else:
-    better_exceptions.hook()
+import better_exceptions; better_exceptions.hook()
 
 parser = ap.ArgumentParser(formatter_class=ap.ArgumentDefaultsHelpFormatter)
 subparsers = parser.add_subparsers(dest="__main__")

@@ -12,9 +12,9 @@ loggext = "*"
 config-library = {extras = ["yaml"], version = "*"}
 nltk = "*"
 filelock = "*"
+better-exceptions = "*"
 
 [dev-packages]
-better-exceptions = "*"
 fastapi = {extras = ["standard"], version = "*"}
 
 [requires]

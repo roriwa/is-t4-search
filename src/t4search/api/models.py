@@ -6,7 +6,7 @@ import typing as t
 from pydantic import BaseModel
 
 
-__all__ = ['Metadata', 'QueryResponseModel', 'ChromaResponseObject']
+__all__ = ['Metadata', 'QueryResponseModel', 'DelegatedResponseModel', 'ChromaResponseObject']
 
 
 class Metadata(BaseModel):
@@ -23,6 +23,12 @@ class QueryResponseModel(BaseModel):
     metadata: Metadata
     distances: float
     document: t.Optional[str]
+
+
+
+class DelegatedResponseModel(BaseModel):
+    delegated_id: str
+    delegated_name: str
 
 
 class ChromaResponseObject(BaseModel):

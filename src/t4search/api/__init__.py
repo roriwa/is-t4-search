@@ -17,7 +17,7 @@ api = fastapi.FastAPI(title="T4Search API")
 def api_query(
         query_text: str = fastapi.Body(examples=[""]),
         topics: t.List[str] = fastapi.Body(default_factory=list, examples=[[]]),
-        persons: t.List[str] =  fastapi.Body(default_factory=list, examples=[[]]),
+        speaker: t.List[str] =  fastapi.Body(default_factory=list, examples=[[]]),
         dates: t.List[str] = fastapi.Body(default_factory=list, examples=[[]]),
         parties: t.List[str] = fastapi.Body(default_factory=list, examples=[[]]),
         limit: t.Optional[int] = fastapi.Body(default=10),
@@ -29,8 +29,8 @@ def api_query(
     ## `topics`:
     specific topics/keywords to search for
 
-    ## `persons`:
-    List of speaker (id) that are allowed
+    ## `speaker`:
+    List of speaker-names that are allowed
 
     ## `dates`:
     Examples:
@@ -54,10 +54,11 @@ def api_query(
 
     wheres = []
 
-    if persons:
+    if speaker:
+        speaker_resolved = api_delegated(names=speaker, n_results=len(speaker) * 4)
         wheres.append({
-            'person': {
-                '$in': persons,
+            'speaker_id': {
+                '$in': [s.delegated_id for s in speaker_resolved],
             }
         })
 
@@ -104,14 +105,12 @@ def api_query(
 
     per_query_limit = limit // (1 + len(topics))
 
-    protocols = chroma_client.get_collection(name="protocols")
+    protocols = chroma_client.get_or_create_collection(name="protocols")
     results = ChromaResponseObject.model_validate(protocols.query(
         query_texts=[query_text, *topics],
         where=where,
         n_results=per_query_limit,
     ))
-
-    print(results)
 
     returns: t.List[QueryResponseModel] = []
 
@@ -123,6 +122,33 @@ def api_query(
                     metadata=results.metadatas[i][j],
                     distances=results.distances[i][j],
                     document=results.documents[i][j],
+                )
+            )
+
+    return returns
+
+
+@api.post("/api/delegated", response_model=t.List[DelegatedResponseModel])
+def api_delegated(
+        names: t.List[str] = fastapi.Body(examples=[[]]),
+        n_results: int = fastapi.Body(default=10),
+):
+    chroma_client = create_chroma_client()
+    delegated_collection = chroma_client.get_or_create_collection(name="delegated")
+
+    results = ChromaResponseObject.model_validate(delegated_collection.query(
+        query_texts=names,
+        n_results=n_results,
+    ))
+
+    returns: t.List[DelegatedResponseModel] = []
+
+    for i in range(len(results.ids)):
+        for j in range(len(results.ids[i])):
+            returns.append(
+                DelegatedResponseModel(
+                    delegated_id=results.ids[i][j],
+                    delegated_name=results.documents[i][j],
                 )
             )
 

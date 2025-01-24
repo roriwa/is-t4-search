@@ -13,6 +13,7 @@ import chromadb
 import filelock
 from loggext.decorators import add_logging
 from ..core import create_mongo_client, create_chroma_client, create_chroma_embedding_function, create_vector_id
+from .models import *
 
 
 sync_lock = filelock.FileLock("sync.lock")
@@ -21,6 +22,44 @@ sync_lock = filelock.FileLock("sync.lock")
 @sync_lock
 def __main__():
     logging.info("initiating sync")
+    # sync_delegated()
+    sync_protocols()
+
+
+def sync_delegated():
+    logging.info("initiating delegated sync")
+
+    # creating connections
+
+    logging.info("creating mongo client")
+    mongo_client = create_mongo_client()
+    mongo_db = mongo_client.get_database("bundestag")
+    mongo_delegated_collection = mongo_db.get_collection(name='mdb_stammdaten')
+
+    logging.info("creating chroma client")
+    chroma_client = create_chroma_client()
+    chroma_delegated_collection = chroma_client.get_or_create_collection(name="delegated")
+
+    mongo_delegated_ids: t.List[str] = [doc['id'] for doc in mongo_delegated_collection.find({}, {'id': 1})]
+
+    for delegated_id in mongo_delegated_ids:
+        delegated_raw = mongo_delegated_collection.find_one({'id': delegated_id})
+        if delegated_raw is None:
+            logging.error("Delegated %s disappeared", delegated_id)
+            continue
+        delegated = MongoDelegatedModel.model_validate(delegated_raw)
+
+        document = f"{delegated.titel} {delegated.vorname} {delegated.nachname}".strip()
+
+        metadata = dict(
+            fraktion=delegated.fraktion or '',
+        )
+
+        chroma_delegated_collection.upsert(ids=[delegated.id], documents=[document], metadatas=[metadata])
+
+
+def sync_protocols():
+    logging.info("initiating protocol sync")
 
     # tokenizer
 
@@ -33,7 +72,7 @@ def __main__():
     mongo_client = create_mongo_client()
 
     mongo_db = mongo_client.get_database("bundestag")
-    mongo_protocols_collection = mongo_db.get_collection("protokolle")
+    mongo_protocols_collection = mongo_db.get_collection(name="protokolle")
     mongo_delegated_collection = mongo_db.get_collection(name='mdb_stammdaten')
 
     mongo_protocol_ids: t.List[int] = [doc['id'] for doc in mongo_protocols_collection.find({}, {'id': 1})]

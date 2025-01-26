@@ -22,7 +22,7 @@ sync_lock = filelock.FileLock("sync.lock")
 @sync_lock
 def __main__():
     logging.info("initiating sync")
-    # sync_delegated()
+    sync_delegated()
     sync_protocols()
 
 

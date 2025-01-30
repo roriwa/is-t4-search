@@ -128,7 +128,7 @@ def api_query(
         for j in range(len(results.ids[i])):
             returns.append(
                 QueryResponseModel(
-                    **split_vector_id(results.ids[i][i]),
+                    **split_vector_id(results.ids[i][j]),
                     metadata=results.metadatas[i][j],
                     distances=results.distances[i][j],
                     document=results.documents[i][j],
